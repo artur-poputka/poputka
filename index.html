@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Попутка</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+.app {
+    max-width: 430px;
+    min-height: 100vh;
+    margin: auto;
+    background: white;
+}
+
+header {
+    padding: 22px 20px 15px;
+    background: linear-gradient(135deg, #315bea, #7047e8);
+    color: white;
+    border-radius: 0 0 25px 25px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.subtitle {
+    margin-top: 6px;
+    opacity: .85;
+}
+
+.content {
+    padding: 20px;
+}
+
+h2 {
+    margin-top: 5px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    margin: 14px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,.08);
+}
+
+.trip {
+    border-left: 5px solid #315bea;
+}
+
+.route {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.info {
+    color: #68738a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+  .match {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e4eaff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.user {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.badge {
+    color: #315bea;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+button {
+    border: none;
+    border-radius: 13px;
+    padding: 13px 17px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.primary {
+    background: #315bea;
+    color: white;
+}
+
+.secondary {
+    background: #edf1ff;
+    color: #315bea;
+}
+
+.add {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.bottom {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 13px 5px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+.bottom button {
+    background: none;
+    color: #697386;
+    padding: 7px;
+}
+
+.bottom button.active {
+    color: #315bea;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.success {
+    color: #16965c;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <div class="logo">🚗 Попутка</div>
+    <div class="subtitle">Твои постоянные попутчики</div>
+</header>
+
+<div class="content">
+
+    <section id="home">
+
+        <h2>Привет! 👋</h2>
+
+        <div class="card trip">
+            <div class="route">🏠 Уфа → Работа</div>
+            <div class="info">
+                Пн–Пт · 07:00–07:30
+
+                Роль: пассажир
+            </div>
+            
+
+            <button class="secondary" onclick="showMatches()">
+                Найти попутчика
+            </button>
+        </div>
+
+        <h2>Подходящие попутчики</h2>
+        <div class="card">
+            <div class="match">
+                <div class="user">
+                    <div class="avatar">👨</div>
+                    <div>
+                        <div class="name">Максим, 28</div>
+                        <div class="badge">✓ Проверенный водитель</div>
+                    </div>
+                </div>
+                <strong>95%</strong>
+            </div>
+
+            <div class="info">
+                🚗 Toyota Corolla
+
+                ⭐ 4.9 · 38 поездок
+
+                📍 Отклонение маршрута: 3 мин
+            </div>
+
+            
+
+            <button class="primary" onclick="requestRide('Максиму')">
+                Предложить поездку
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="match">
+                <div class="user">
+                    <div class="avatar">👩</div>
+                    <div>
+                        <div class="name">Анна, 31</div>
+                        <div class="badge">✓ Надёжный пассажир</div>
+                    </div>
+                </div>
+                <strong>88%</strong>
+            </div>
+
+            <div class="info">
+                📍 Совпадение маршрута
+
+                ⭐ 4.8 · 24 поездки
+
+                🕐 Время пересечения: 07:05–07:25
+            </div>
+
+            
+
+            <button class="primary" onclick="requestRide('Анне')">
+                Предложить поездку
+            </button>
+        </div>
+
+        <button class="primary add" onclick="addRoute()">
+            ＋ Добавить маршрут
+        </button>
+
+    </section>
+
+    <section id="messages" class="hidden">
+        <h2>Сообщения</h2>
+
+        <div class="card">
+            <div class="user">
+                <div class="avatar">👨</div>
+                <div>
+                    <div class="name">Максим</div>
+                    <div class="info">Привет! Где удобнее встретиться?</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="trips" class="hidden">
+        <h2>Мои поездки</h2>
+
+        <div class="card trip">
+            <div class="route">🏠 → 🏢 Работа</div>
+            <div class="info">
+                Завтра · 07:10
+
+                Водитель: Максим
+            </div>
+            
+
+            <span class="success">✓ Договорённость подтверждена</span>
+        </div>
+    </section>
+
+    <section id="profile" class="hidden">
+        <h2>Мой профиль</h2>
+
+        <div class="card">
+            <div class="user">
+                <div class="avatar">👤</div>
+                <div>
+                    <div class="name">Артур</div>
+                    <div class="info">Уфа · 28 лет</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="info">
+                ⭐ Рейтинг: 4.9
+
+                🚗 Маршрутов: 2
+
+                ✓ Телефон подтверждён
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<div class="bottom">
+    <button class="active" onclick="openSection('home', this)">🏠
+Главная</button>
+    <button onclick="openSection('messages', this)">💬
+Сообщения</button>
+    <button onclick="openSection('trips', this)">🚗
+Поездки</button>
+    <button onclick="openSection('profile', this)">👤
+Профиль</button>
+</div>
+
+</div>
+
+<script>
+  function openSection(section, button) {
+
+    document.querySelectorAll("section").forEach(function(item) {
+        item.classList.add("hidden");
+    });
+
+    document.getElementById(section).classList.remove("hidden");
+
+    document.querySelectorAll(".bottom button").forEach(function(item) {
+        item.classList.remove("active");
+    });
+
+    button.classList.add("active");
+}
+
+function showMatches() {
+    alert("Ищем подходящих попутчиков по вашему маршруту...");
+}
+
+function requestRide(name) {
+    alert("Запрос отправлен " + name + "!");
+}
+
+function addRoute() {
+    alert("Здесь мы сделаем создание маршрута: откуда → куда → дни → время.");
+}
+
+</script>
+
+</body>
+</html>
