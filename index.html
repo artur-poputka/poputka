@@ -502,6 +502,45 @@ function addRoute() {
         };
 
         item.appendChild(details);
+        const editButton = document.createElement("button");
+        editButton.textContent = "Изменить маршрут";
+
+        editButton.onclick = function() {
+            const newFrom = prompt("Откуда вы едете?", route.from);
+            if (newFrom === null || newFrom.trim() === "") return;
+
+            const newTo = prompt("Куда вы едете?", route.to);
+            if (newTo === null || newTo.trim() === "") return;
+
+            const newDays = prompt(
+                "В какие дни вы ездите?",
+                route.days
+            );
+            if (newDays === null || newDays.trim() === "") return;
+
+            const newTime = prompt(
+                "Во сколько?",
+                route.time
+            );
+            if (newTime === null || newTime.trim() === "") return;
+
+            routes[index] = {
+                from: newFrom.trim(),
+                to: newTo.trim(),
+                days: newDays.trim(),
+                time: newTime.trim()
+            };
+
+            localStorage.setItem(
+                "poputkaRoutes",
+                JSON.stringify(routes)
+            );
+
+            showSavedRoutes();
+            alert("Маршрут успешно изменён!");
+        };
+
+        item.appendChild(editButton);
         item.appendChild(remove);
         list.appendChild(item);
     });
