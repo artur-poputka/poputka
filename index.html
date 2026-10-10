@@ -558,6 +558,26 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
 
         item.appendChild(details);
         section.appendChild(item);
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Отменить заявку";
+        cancelButton.style.marginTop = "8px";
+
+        cancelButton.onclick = function() {
+            const confirmed = confirm("Отменить заявку " + request.name + "?");
+
+            if (!confirmed) return;
+
+            requests.splice(requests.indexOf(request), 1);
+
+            localStorage.setItem(
+                "poputkaRequests",
+                JSON.stringify(requests)
+            );
+
+            showMyRequests();
+        };
+
+        item.appendChild(cancelButton);
     });
 }
 
