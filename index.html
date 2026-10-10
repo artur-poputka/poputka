@@ -350,30 +350,143 @@ function showMatches() {
         return;
     }
 
-    const route = routes[routes.length - 1];
+    const myRoute = routes[routes.length - 1];
 
-    alert(
-        "Ищем попутчиков по вашему маршруту!\n\n" +
-        "Откуда: " + route.from + "\n" +
-        "Куда: " + route.to + "\n" +
-        "Дни: " + route.days + "\n" +
-        "Время: " + route.time
-    );
-
-    const matches = document.querySelector(".matches");
-
-    if (matches) {
-        matches.scrollIntoView({ behavior: "smooth" });
-    } else {
-        const heading = Array.from(document.querySelectorAll("h1, h2, h3"))
-            .find(element =>
-                element.textContent.includes("Подходящие попутчики")
-            );
-
-        if (heading) {
-            heading.scrollIntoView({ behavior: "smooth" });
+    const candidates = [
+        {
+            name: "Максим",
+            from: "Уфа, центр",
+            to: "Уфа, Инорс",
+            days: "Пн–Пт",
+            time: "07:00–07:30"
+        },
+        {
+            name: "Анна",
+            from: "Уфа, центр",
+            to: "Уфа, Инорс",
+            days: "Пн–Пт",
+            time: "08:00–08:30"
         }
+    ];
+
+    function normalize(text) {
+        return text
+            .toLowerCase()
+            .replace(/ё/g, "е")
+            .replace(/[.,]/g, "")
+            .trim();
     }
+
+    function timeToMinutes(text) {
+        const match = text.match(/(\d{1,2}):(\d{2})/);
+        if (!match) return null;
+        return Number(match[1]) * 60 + Number(match[2]);
+    }
+
+    function routeScore(candidate) {
+        let score = 0;
+
+        const sameFrom =
+            normalize(candidate.from) === normalize(myRoute.from);
+        const sameTo =
+            normalize(candidate.to) === normalize(myRoute.to);
+
+        if (!sameFrom || !sameTo) return 0;
+
+        score += 4;
+
+        if (
+            normalize(candidate.days).replace(/\s/g, "") ===
+            normalize(myRoute.days).replace(/\s/g, "")
+        ) {
+            score += 3;
+        }
+
+        const myTime = timeToMinutes(myRoute.time);
+        const theirTime = timeToMinutes(candidate.time);
+
+        if (myTime !== null && theirTime !== null) {
+            const difference = Math.abs(myTime - theirTime);
+
+            if (difference <= 15) score += 3;
+            else if (difference <= 30) score += 2;
+            else if (difference <= 60) score += 1;
+        }
+
+        return score;
+    }
+    const matches = candidates
+        .map(candidate => ({
+            ...candidate,
+            score: routeScore(candidate)
+        }))
+        .filter(candidate => candidate.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+    let section = document.getElementById("route-matches");
+
+    if (!section) {
+        section = document.createElement("div");
+        section.id = "route-matches";
+        section.style.padding = "16px";
+        section.style.margin = "16px 0";
+        section.style.background = "#ffffff";
+        section.style.borderRadius = "12px";
+
+        document.body.appendChild(section);
+    }
+
+    section.replaceChildren();
+
+    const heading = document.createElement("h2");
+    heading.textContent = "Подходящие попутчики";
+    section.appendChild(heading);
+
+    const routeInfo = document.createElement("p");
+    routeInfo.textContent =
+        "Ваш маршрут: " + myRoute.from + " → " + myRoute.to +
+        " | " + myRoute.days + " | " + myRoute.time;
+    section.appendChild(routeInfo);
+
+    if (matches.length === 0) {
+        const message = document.createElement("p");
+        message.textContent =
+            "Пока нет попутчиков с похожим маршрутом.";
+        section.appendChild(message);
+    } else {
+        matches.forEach(candidate => {
+            const card = document.createElement("div");
+            card.style.padding = "12px";
+            card.style.marginBottom = "10px";
+            card.style.border = "1px solid #dddddd";
+            card.style.borderRadius = "8px";
+
+            const name = document.createElement("h3");
+            name.textContent = candidate.name;
+            card.appendChild(name);
+
+            const details = document.createElement("p");
+            details.textContent =
+                candidate.from + " → " + candidate.to +
+                " | " + candidate.days +
+                " | " + candidate.time;
+            card.appendChild(details);
+            const score = document.createElement("p");
+            score.textContent = "Совпадение: " + candidate.score + " из 10";
+            card.appendChild(score);
+
+            const button = document.createElement("button");
+            button.textContent = "Предложить поездку";
+            button.onclick = function() {
+                requestRide(candidate.name);
+            };
+            card.appendChild(button);
+
+            section.appendChild(card);
+        });
+    }
+
+    section.scrollIntoView({ behavior: "smooth" });
 }
 
 function requestRide(name) {
