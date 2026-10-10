@@ -335,7 +335,45 @@ button {
 }
 
 function showMatches() {
-    alert("Ищем подходящих попутчиков по вашему маршруту...");
+    let routes = [];
+
+    try {
+        routes = JSON.parse(
+            localStorage.getItem("poputkaRoutes") || "[]"
+        );
+    } catch (error) {
+        routes = [];
+    }
+
+    if (routes.length === 0) {
+        alert("Сначала добавьте маршрут в разделе «Мои маршруты».");
+        return;
+    }
+
+    const route = routes[routes.length - 1];
+
+    alert(
+        "Ищем попутчиков по вашему маршруту!\n\n" +
+        "Откуда: " + route.from + "\n" +
+        "Куда: " + route.to + "\n" +
+        "Дни: " + route.days + "\n" +
+        "Время: " + route.time
+    );
+
+    const matches = document.querySelector(".matches");
+
+    if (matches) {
+        matches.scrollIntoView({ behavior: "smooth" });
+    } else {
+        const heading = Array.from(document.querySelectorAll("h1, h2, h3"))
+            .find(element =>
+                element.textContent.includes("Подходящие попутчики")
+            );
+
+        if (heading) {
+            heading.scrollIntoView({ behavior: "smooth" });
+        }
+    }
 }
 
 function requestRide(name) {
