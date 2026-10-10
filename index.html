@@ -352,16 +352,27 @@ function addRoute() {
     const days = prompt("В какие дни вы ездите? Например: Пн–Пт");
     if (days === null || days.trim() === "") return;
 
-    const time = prompt("Во сколько? Например: с 07:00 до 07:30");
+    const time = prompt("Во сколько? Например: 07:00–07:30");
     if (time === null || time.trim() === "") return;
 
-    alert(
-        "Маршрут добавлен!\n\n" +
-        "Откуда: " + from + "\n" +
-        "Куда: " + to + "\n" +
-        "Дни: " + days + "\n" +
-        "Время: " + time
-    );
+    let routes = [];
+
+    try {
+        routes = JSON.parse(localStorage.getItem("poputkaRoutes") || "[]");
+    } catch (error) {
+        routes = [];
+    }
+
+    routes.push({
+        from: from.trim(),
+        to: to.trim(),
+        days: days.trim(),
+        time: time.trim()
+    });
+
+    localStorage.setItem("poputkaRoutes", JSON.stringify(routes));
+
+    alert("Маршрут сохранён в этом браузере!");
 }
 
 </script>
