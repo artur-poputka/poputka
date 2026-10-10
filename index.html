@@ -374,8 +374,77 @@ function addRoute() {
 
     alert("Маршрут сохранён в этом браузере!");
 }
+    function showSavedRoutes() {
+    const routes = JSON.parse(
+        localStorage.getItem("poputkaRoutes") || "[]"
+    );
+
+    let list = document.getElementById("saved-routes");
+
+    if (!list) {
+        list = document.createElement("div");
+        list.id = "saved-routes";
+        list.style.padding = "16px";
+        list.style.margin = "16px 0";
+        list.style.background = "#ffffff";
+        list.style.borderRadius = "12px";
+
+        const heading = document.createElement("h2");
+        heading.textContent = "Мои маршруты";
+        list.appendChild(heading);
+
+        const button = document.querySelector("button");
+        if (button) {
+            button.parentNode.insertBefore(list, button);
+        } else {
+            document.body.appendChild(list);
+        }
+    }
+
+    list.replaceChildren();
+
+    const heading = document.createElement("h2");
+    heading.textContent = "Мои маршруты";
+    list.appendChild(heading);
+
+    if (routes.length === 0) {
+        const message = document.createElement("p");
+        message.textContent = "Пока маршрутов нет.";
+        list.appendChild(message);
+        return;
+    }
+
+    routes.forEach((route, index) => {
+        const item = document.createElement("div");
+        item.style.padding = "12px";
+        item.style.marginBottom = "10px";
+        item.style.borderBottom = "1px solid #dddddd";
+
+        const details = document.createElement("p");
+        details.textContent =
+            route.from + " → " + route.to +
+            " | " + route.days +
+            " | " + route.time;
+
+        const remove = document.createElement("button");
+        remove.textContent = "Удалить маршрут";
+        remove.onclick = function () {
+            routes.splice(index, 1);
+            localStorage.setItem(
+                "poputkaRoutes",
+                JSON.stringify(routes)
+            );
+            showSavedRoutes();
+        };
+
+        item.appendChild(details);
+        item.appendChild(remove);
+        list.appendChild(item);
+    });
+}
+
+window.addEventListener("DOMContentLoaded", showSavedRoutes);
 
 </script>
-
 </body>
 </html>
