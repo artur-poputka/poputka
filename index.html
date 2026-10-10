@@ -343,7 +343,25 @@ function requestRide(name) {
 }
 
 function addRoute() {
-    alert("Здесь мы сделаем создание маршрута: откуда → куда → дни → время.");
+    const from = prompt("Откуда вы едете?");
+    if (from === null || from.trim() === "") return;
+
+    const to = prompt("Куда вы едете?");
+    if (to === null || to.trim() === "") return;
+
+    const days = prompt("В какие дни вы ездите? Например: Пн–Пт");
+    if (days === null || days.trim() === "") return;
+
+    const time = prompt("Во сколько? Например: с 07:00 до 07:30");
+    if (time === null || time.trim() === "") return;
+
+    alert(
+        "Маршрут добавлен!\n\n" +
+        "Откуда: " + from + "\n" +
+        "Куда: " + to + "\n" +
+        "Дни: " + days + "\n" +
+        "Время: " + time
+    );
 }
 
 </script>
