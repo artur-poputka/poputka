@@ -377,7 +377,33 @@ function showMatches() {
 }
 
 function requestRide(name) {
-    alert("Запрос отправлен " + name + "!");
+    let requests = [];
+
+    try {
+        requests = JSON.parse(
+            localStorage.getItem("poputkaRequests") || "[]"
+        );
+    } catch (error) {
+        requests = [];
+    }
+
+    requests.push({
+        name: name,
+        date: new Date().toLocaleString("ru-RU"),
+        status: "Ожидает ответа"
+    });
+
+    localStorage.setItem(
+        "poputkaRequests",
+        JSON.stringify(requests)
+    );
+
+    alert(
+        "Заявка сохранена!\n\n" +
+        "Попутчик: " + name + "\n" +
+        "Статус: Ожидает ответа\n\n" +
+        "Пока заявка хранится только в этом браузере."
+    );
 }
 
 function addRoute() {
