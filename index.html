@@ -508,6 +508,60 @@ function addRoute() {
 }
 
 window.addEventListener("DOMContentLoaded", showSavedRoutes);
+  function showMyRequests() {
+    let requests = [];
+
+    try {
+        requests = JSON.parse(
+            localStorage.getItem("poputkaRequests") || "[]"
+        );
+    } catch (error) {
+        requests = [];
+    }
+
+    let section = document.getElementById("my-requests");
+
+    if (!section) {
+        section = document.createElement("div");
+        section.id = "my-requests";
+        section.style.padding = "16px";
+        section.style.margin = "16px 0";
+        section.style.background = "#ffffff";
+        section.style.borderRadius = "12px";
+
+        document.body.appendChild(section);
+    }
+
+    section.replaceChildren();
+
+    const heading = document.createElement("h2");
+    heading.textContent = "Мои заявки";
+    section.appendChild(heading);
+
+    if (requests.length === 0) {
+        const message = document.createElement("p");
+        message.textContent = "Вы пока не отправляли заявки.";
+        section.appendChild(message);
+        return;
+    }
+
+    requests.forEach(function(request) {
+        const item = document.createElement("div");
+        item.style.padding = "12px";
+        item.style.borderBottom = "1px solid #dddddd";
+
+        const details = document.createElement("p");
+        details.textContent =
+            "Попутчик: " + request.name +
+            " | Статус: " + request.status +
+            " | Дата: " + request.date;
+
+        item.appendChild(details);
+        section.appendChild(item);
+    });
+}
+
+window.addEventListener("DOMContentLoaded", showMyRequests);  
 
 </script>
 </body>
