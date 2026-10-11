@@ -556,32 +556,11 @@ async function addRoute() {
 
     alert("Маршрут сохранён!");
 }
-    function showSavedRoutes() {
-    const routes = JSON.parse(
-        localStorage.getItem("poputkaRoutes") || "[]"
-    );
+    async function showSavedRoutes() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
-    let list = document.getElementById("saved-routes");
-
-    if (!list) {
-        list = document.createElement("div");
-        list.id = "saved-routes";
-        list.style.padding = "16px";
-        list.style.margin = "16px 0";
-        list.style.background = "#ffffff";
-        list.style.borderRadius = "12px";
-
-        const heading = document.createElement("h2");
-        heading.textContent = "Мои маршруты";
-        list.appendChild(heading);
-
-        const button = document.querySelector("button");
-        if (button) {
-            button.parentNode.insertBefore(list, button);
-        } else {
-            document.body.appendChild(list);
-        }
-    }
+    const list = document.getElementById("saved-routes");
+    if (!list) return;
 
     list.replaceChildren();
 
@@ -589,14 +568,28 @@ async function addRoute() {
     heading.textContent = "Мои маршруты";
     list.appendChild(heading);
 
-    if (routes.length === 0) {
-        const message = document.createElement("p");
-        message.textContent = "Пока маршрутов нет.";
-        list.appendChild(message);
+    if (!user) {
+        list.append("Войди в аккаунт, чтобы увидеть свои маршруты.");
         return;
     }
 
-    routes.forEach((route, index) => {
+    const { data: routes, error } = await supabaseClient
+        .from("routes")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        list.append("Ошибка загрузки: " + error.message);
+        return;
+    }
+
+    if (!routes || routes.length === 0) {
+        list.append("Пока маршрутов нет.");
+        return;
+    }
+
+    for (const route of routes) {
         const item = document.createElement("div");
         item.style.padding = "12px";
         item.style.marginBottom = "10px";
@@ -604,64 +597,34 @@ async function addRoute() {
 
         const details = document.createElement("p");
         details.textContent =
-            route.from + " → " + route.to +
+            route.from_city + " → " + route.to_city +
             " | " + route.days +
-            " | " + route.time;
+            " | " + route.departure_time;
 
         const remove = document.createElement("button");
         remove.textContent = "Удалить маршрут";
-        remove.onclick = function () {
-            routes.splice(index, 1);
-            localStorage.setItem(
-                "poputkaRoutes",
-                JSON.stringify(routes)
-            );
-            showSavedRoutes();
+
+        remove.onclick = async function () {
+            if (!confirm("Удалить этот маршрут?")) return;
+
+            const { error } = await supabaseClient
+                .from("routes")
+                .delete()
+                .eq("id", route.id)
+                .eq("user_id", user.id);
+
+            if (error) {
+                alert("Ошибка удаления: " + error.message);
+                return;
+            }
+
+            await showSavedRoutes();
         };
 
         item.appendChild(details);
-        const editButton = document.createElement("button");
-        editButton.textContent = "Изменить маршрут";
-
-        editButton.onclick = function() {
-            const newFrom = prompt("Откуда вы едете?", route.from);
-            if (newFrom === null || newFrom.trim() === "") return;
-
-            const newTo = prompt("Куда вы едете?", route.to);
-            if (newTo === null || newTo.trim() === "") return;
-
-            const newDays = prompt(
-                "В какие дни вы ездите?",
-                route.days
-            );
-            if (newDays === null || newDays.trim() === "") return;
-
-            const newTime = prompt(
-                "Во сколько?",
-                route.time
-            );
-            if (newTime === null || newTime.trim() === "") return;
-
-            routes[index] = {
-                from: newFrom.trim(),
-                to: newTo.trim(),
-                days: newDays.trim(),
-                time: newTime.trim()
-            };
-
-            localStorage.setItem(
-                "poputkaRoutes",
-                JSON.stringify(routes)
-            );
-
-            showSavedRoutes();
-            alert("Маршрут успешно изменён!");
-        };
-
-        item.appendChild(editButton);
         item.appendChild(remove);
         list.appendChild(item);
-    });
+    }
 }
 
 window.addEventListener("DOMContentLoaded", showSavedRoutes);
