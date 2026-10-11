@@ -690,7 +690,10 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
 const otherRoutes = routes.filter(route => route.user_id !== user?.id);
         const { data: { user } } = await supabaseClient.auth.getUser();
 const otherRoutes = (routes || []).filter(route => route.user_id !== user?.id);
-        if (!routes || routes.length === 0) {
+        
+
+
+if (!otherRoutes || otherRoutes.length === 0) { {
         alert("Совпадений пока нет.");
         return;
     }
