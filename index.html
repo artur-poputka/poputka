@@ -736,5 +736,16 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
 window.addEventListener("DOMContentLoaded", showMyRequests);  
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://ambjmpbtxqekiudhsucf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xd8W7A1x9m8mmx_W9nTmpg_-b83jucM";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 </body>
 </html>
