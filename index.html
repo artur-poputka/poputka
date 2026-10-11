@@ -561,11 +561,11 @@ async function addRoute() {
 
     let list = document.getElementById("saved-routes");
 
-if (!list) {
-    list = document.createElement("div");
-    list.id = "saved-routes";
-    document.body.appendChild(list);
-}
+    if (!list) {
+        list = document.createElement("div");
+        list.id = "saved-routes";
+        document.body.appendChild(list);
+    }
 
     list.replaceChildren();
 
@@ -574,7 +574,7 @@ if (!list) {
     list.appendChild(heading);
 
     if (!user) {
-        list.append("Войди в аккаунт, чтобы увидеть свои маршруты.");
+        list.append("Войди в аккаунт, чтобы увидеть маршруты.");
         return;
     }
 
@@ -598,7 +598,7 @@ if (!list) {
         const item = document.createElement("div");
         item.style.padding = "12px";
         item.style.marginBottom = "10px";
-        item.style.borderBottom = "1px solid #dddddd";
+        item.style.borderBottom = "1px solid #ddd";
 
         const details = document.createElement("p");
         details.textContent =
@@ -606,11 +606,47 @@ if (!list) {
             " | " + route.days +
             " | " + route.departure_time;
 
+        const edit = document.createElement("button");
+        edit.textContent = "Изменить маршрут";
+
+        edit.onclick = async function () {
+            const from = prompt("Откуда вы едете?", route.from_city);
+            if (from === null || !from.trim()) return;
+
+            const to = prompt("Куда вы едете?", route.to_city);
+            if (to === null || !to.trim()) return;
+
+            const days = prompt("В какие дни?", route.days);
+            if (days === null || !days.trim()) return;
+
+            const time = prompt("Во сколько?", route.departure_time);
+            if (time === null || !time.trim()) return;
+
+            const { error } = await supabaseClient
+                .from("routes")
+                .update({
+                    from_city: from.trim(),
+                    to_city: to.trim(),
+                    days: days.trim(),
+                    departure_time: time.trim()
+                })
+                .eq("id", route.id)
+                .eq("user_id", user.id);
+
+            if (error) {
+                alert("Ошибка изменения: " + error.message);
+                return;
+            }
+
+            alert("Маршрут изменён!");
+            await showSavedRoutes();
+        };
+
         const remove = document.createElement("button");
         remove.textContent = "Удалить маршрут";
 
         remove.onclick = async function () {
-            if (!confirm("Удалить этот маршрут?")) return;
+            if (!confirm("Удалить маршрут?")) return;
 
             const { error } = await supabaseClient
                 .from("routes")
@@ -626,8 +662,7 @@ if (!list) {
             await showSavedRoutes();
         };
 
-        item.appendChild(details);
-        item.appendChild(remove);
+        item.append(details, edit, remove);
         list.appendChild(item);
     }
 }
