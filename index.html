@@ -677,7 +677,7 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
 
     const { data: routes, error } = await supabaseClient
         .from("routes")
-        .select("from_city, to_city, days, departure_time")
+       .select("from_city, to_city, days, departure_time, user_id")
         .ilike("from_city", "%" + from.trim() + "%")
         .ilike("to_city", "%" + to.trim() + "%");
 
@@ -686,12 +686,16 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
         return;
     }
 
-    if (!routes || routes.length === 0) {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+const otherRoutes = routes.filter(route => route.user_id !== user?.id);
+        const { data: { user } } = await supabaseClient.auth.getUser();
+const otherRoutes = (routes || []).filter(route => route.user_id !== user?.id);
+        if (!routes || routes.length === 0) {
         alert("Совпадений пока нет.");
         return;
     }
 
-    alert(routes.map(route =>
+    alert(otherRoutes.map(route =>
         route.from_city + " → " + route.to_city +
         " | " + route.days +
         " | " + route.departure_time
