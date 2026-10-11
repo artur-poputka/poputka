@@ -686,7 +686,6 @@ window.addEventListener("DOMContentLoaded", showSavedRoutes);
         return;
     }
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
 const otherRoutes = routes.filter(route => route.user_id !== user?.id);
         const { data: { user } } = await supabaseClient.auth.getUser();
 const otherRoutes = (routes || []).filter(route => route.user_id !== user?.id);
