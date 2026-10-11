@@ -747,5 +747,61 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 </script>
+<section id="auth-section">
+  <h2>Вход и регистрация</h2>
+
+  <label for="auth-email">Электронная почта</label>
+  <input id="auth-email" type="email" placeholder="Твоя почта">
+
+  <label for="auth-password">Пароль</label>
+  <input id="auth-password" type="password" placeholder="Придумай пароль">
+
+  <button type="button" onclick="signUp()">Зарегистрироваться</button>
+  <button type="button" onclick="signIn()">Войти</button>
+
+  <p id="auth-message"></p>
+</section>
+
+<script>
+async function signUp() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  const message = document.getElementById("auth-message");
+
+  if (!email || !password) {
+    message.textContent = "Введи электронную почту и пароль.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? "Ошибка регистрации: " + error.message
+    : "Проверь почту для подтверждения регистрации.";
+}
+
+async function signIn() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  const message = document.getElementById("auth-message");
+
+  if (!email || !password) {
+    message.textContent = "Введи электронную почту и пароль.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? "Ошибка входа: " + error.message
+    : "Ты успешно вошёл!";
+}
+</script>
 </body>
 </html>
