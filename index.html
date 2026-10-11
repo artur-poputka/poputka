@@ -519,37 +519,42 @@ function requestRide(name) {
     );
 }
 
-function addRoute() {
-    const from = prompt("Откуда вы едете?");
-    if (from === null || from.trim() === "") return;
+async function addRoute() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
-    const to = prompt("Куда вы едете?");
-    if (to === null || to.trim() === "") return;
-
-    const days = prompt("В какие дни вы ездите? Например: Пн–Пт");
-    if (days === null || days.trim() === "") return;
-
-    const time = prompt("Во сколько? Например: 07:00–07:30");
-    if (time === null || time.trim() === "") return;
-
-    let routes = [];
-
-    try {
-        routes = JSON.parse(localStorage.getItem("poputkaRoutes") || "[]");
-    } catch (error) {
-        routes = [];
+    if (!user) {
+        alert("Сначала войди в аккаунт!");
+        return;
     }
 
-    routes.push({
-        from: from.trim(),
-        to: to.trim(),
-        days: days.trim(),
-        time: time.trim()
-    });
+    const from = prompt("Откуда вы едете?");
+    if (!from || !from.trim()) return;
 
-    localStorage.setItem("poputkaRoutes", JSON.stringify(routes));
+    const to = prompt("Куда вы едете?");
+    if (!to || !to.trim()) return;
 
-    alert("Маршрут сохранён в этом браузере!");
+    const days = prompt("В какие дни? Например: Пн–Пт");
+    if (!days || !days.trim()) return;
+
+    const time = prompt("Во сколько? Например: 07:00–07:30");
+    if (!time || !time.trim()) return;
+
+    const { error } = await supabaseClient
+        .from("routes")
+        .insert({
+            user_id: user.id,
+            from_city: from.trim(),
+            to_city: to.trim(),
+            days: days.trim(),
+            departure_time: time.trim()
+        });
+
+    if (error) {
+        alert("Ошибка сохранения: " + error.message);
+        return;
+    }
+
+    alert("Маршрут сохранён!");
 }
     function showSavedRoutes() {
     const routes = JSON.parse(
