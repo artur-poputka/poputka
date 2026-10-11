@@ -559,8 +559,13 @@ async function addRoute() {
     async function showSavedRoutes() {
     const { data: { user } } = await supabaseClient.auth.getUser();
 
-    const list = document.getElementById("saved-routes");
-    if (!list) return;
+    let list = document.getElementById("saved-routes");
+
+if (!list) {
+    list = document.createElement("div");
+    list.id = "saved-routes";
+    document.body.appendChild(list);
+}
 
     list.replaceChildren();
 
