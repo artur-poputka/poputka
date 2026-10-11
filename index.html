@@ -668,6 +668,35 @@ async function addRoute() {
 }
 
 window.addEventListener("DOMContentLoaded", showSavedRoutes);
+    async function findRoutes() {
+    const from = prompt("Откуда ищем попутчика?");
+    if (!from || !from.trim()) return;
+
+    const to = prompt("Куда едем?");
+    if (!to || !to.trim()) return;
+
+    const { data: routes, error } = await supabaseClient
+        .from("routes")
+        .select("from_city, to_city, days, departure_time")
+        .ilike("from_city", "%" + from.trim() + "%")
+        .ilike("to_city", "%" + to.trim() + "%");
+
+    if (error) {
+        alert("Ошибка поиска: " + error.message);
+        return;
+    }
+
+    if (!routes || routes.length === 0) {
+        alert("Совпадений пока нет.");
+        return;
+    }
+
+    alert(routes.map(route =>
+        route.from_city + " → " + route.to_city +
+        " | " + route.days +
+        " | " + route.departure_time
+    ).join("\n"));
+}
   function showMyRequests() {
     let requests = [];
 
